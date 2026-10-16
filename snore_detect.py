@@ -305,49 +305,48 @@ def _glass_defs(sfx):
         '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.58"/>'
         '<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>'
         "</linearGradient>"
-        # 柱状图: 横向柱面, 光从左侧打 → 左亮带 / 右暗核; 整体压得很透
+        # 柱状图: 横向柱面, 光从左侧打 → 左亮带 / 右暗核; 蓝加深一档, 保持半透
         f'<linearGradient id="glassBody{sfx}" x1="0" y1="0" x2="1" y2="0">'
-        '<stop offset="0%" stop-color="#2A64A6" stop-opacity="0.20"/>'
-        '<stop offset="18%" stop-color="#FFFFFF" stop-opacity="0.60"/>'
-        '<stop offset="34%" stop-color="#A8D2F7" stop-opacity="0.34"/>'
-        '<stop offset="62%" stop-color="#6FA9E6" stop-opacity="0.26"/>'
-        '<stop offset="88%" stop-color="#2E6FB4" stop-opacity="0.26"/>'
-        '<stop offset="100%" stop-color="#22497E" stop-opacity="0.34"/>'
+        '<stop offset="0%" stop-color="#1E4E86" stop-opacity="0.34"/>'
+        '<stop offset="16%" stop-color="#DCEBFF" stop-opacity="0.58"/>'
+        '<stop offset="34%" stop-color="#6FA9E6" stop-opacity="0.46"/>'
+        '<stop offset="62%" stop-color="#2E78C8" stop-opacity="0.44"/>'
+        '<stop offset="100%" stop-color="#123C6B" stop-opacity="0.52"/>'
         "</linearGradient>"
         f'<linearGradient id="glassVert{sfx}" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>'
-        '<stop offset="52%" stop-color="#BFE0FF" stop-opacity="0.05"/>'
-        '<stop offset="100%" stop-color="#2E84E6" stop-opacity="0.20"/>'
+        '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.14"/>'
+        '<stop offset="50%" stop-color="#CFE6FF" stop-opacity="0.06"/>'
+        '<stop offset="100%" stop-color="#0A5BB8" stop-opacity="0.28"/>'
         "</linearGradient>"
         f'<linearGradient id="glassSpec{sfx}" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>'
-        '<stop offset="55%" stop-color="#FFFFFF" stop-opacity="0.80"/>'
-        '<stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.20"/>'
+        '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>'
+        '<stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.70"/>'
+        '<stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.10"/>'
         "</linearGradient>"
         "</defs>"
     )
 
 
 def _glass_column(x, ytop, ybot, w, sfx):
-    """一根立体琉璃柱: 侧面外鼓 + 顶面圆弧突起 + 柱面明暗 + 竖向高光 + 顶珠。"""
+    """一根凝胶半透明柱: 直边 + 顶面圆弧突起 + 圆润柱面明暗 + 侧光高光。"""
     h = ybot - ytop
     x0, x1, xm = x, x + w, x + w / 2.0
-    ym = (ytop + ybot) / 2.0
-    bulge = min(w * 0.09, 5.5)                        # 侧面鼓出量
     dome = min(min(w * 0.22, 7.0), h * 0.5)           # 顶面圆弧突起
+    r = min(w * 0.22, 4.0, h * 0.5)                   # 底部圆角(凝胶柔软感)
     d = (f"M {x0:.2f} {ytop:.2f} "
          f"Q {xm:.2f} {ytop - dome:.2f} {x1:.2f} {ytop:.2f} "
-         f"Q {x1 + bulge:.2f} {ym:.2f} {x1:.2f} {ybot:.2f} "
-         f"L {x0:.2f} {ybot:.2f} "
-         f"Q {x0 - bulge:.2f} {ym:.2f} {x0:.2f} {ytop:.2f} Z")
+         f"L {x1:.2f} {ybot - r:.2f} "
+         f"Q {x1:.2f} {ybot:.2f} {x1 - r:.2f} {ybot:.2f} "
+         f"L {x0 + r:.2f} {ybot:.2f} "
+         f"Q {x0:.2f} {ybot:.2f} {x0:.2f} {ybot - r:.2f} Z")
     out = (f'<path d="{d}" fill="url(#glassBody{sfx})"/>'
            f'<path d="{d}" fill="url(#glassVert{sfx})"/>'
-           f'<path d="{d}" fill="none" stroke="#ffffff" stroke-opacity="0.45" '
-           f'stroke-width="0.7"/>')
+           f'<path d="{d}" fill="none" stroke="#ffffff" stroke-opacity="0.28" '
+           f'stroke-width="0.6"/>')
     if h > 12 and w > 12:                             # 侧光高光条(靠左, 光从左边来)
-        hw = max(1.4, w * 0.17)
-        out += (f'<rect x="{x0 + w * 0.16:.2f}" y="{ytop + h * 0.14:.2f}" '
-                f'width="{hw:.2f}" height="{h * 0.58:.2f}" rx="{hw / 2:.2f}" '
+        hw = max(1.4, w * 0.18)
+        out += (f'<rect x="{x0 + w * 0.17:.2f}" y="{ytop + h * 0.16:.2f}" '
+                f'width="{hw:.2f}" height="{h * 0.56:.2f}" rx="{hw / 2:.2f}" '
                 f'fill="url(#glassSpec{sfx})"/>')
     return out
 
