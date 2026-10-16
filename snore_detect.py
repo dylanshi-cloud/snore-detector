@@ -293,9 +293,9 @@ def _glass_defs(sfx):
         "<defs>"
         # 时间轴: 竖向玻璃胶囊
         f'<linearGradient id="glassBlue{sfx}" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#DCF7E3" stop-opacity="0.70"/>'
-        '<stop offset="45%" stop-color="#86D39C" stop-opacity="0.52"/>'
-        '<stop offset="100%" stop-color="#2E9E52" stop-opacity="0.40"/>'
+        '<stop offset="0%" stop-color="#FFF0DC" stop-opacity="0.70"/>'
+        '<stop offset="45%" stop-color="#F7B96A" stop-opacity="0.52"/>'
+        '<stop offset="100%" stop-color="#E07C00" stop-opacity="0.40"/>'
         "</linearGradient>"
         f'<linearGradient id="glassGray{sfx}" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0%" stop-color="#F2F2F6" stop-opacity="0.78"/>'
@@ -305,18 +305,18 @@ def _glass_defs(sfx):
         '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.58"/>'
         '<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>'
         "</linearGradient>"
-        # 柱状图: 横向柱面, 光从左侧打 → 左亮带 / 右暗核; 半透明绿
+        # 柱状图: 横向柱面, 光从左侧打 → 左亮带 / 右暗核; 半透明橙
         f'<linearGradient id="glassBody{sfx}" x1="0" y1="0" x2="1" y2="0">'
-        '<stop offset="0%" stop-color="#145C31" stop-opacity="0.34"/>'
-        '<stop offset="16%" stop-color="#E6F9EC" stop-opacity="0.58"/>'
-        '<stop offset="34%" stop-color="#7CD695" stop-opacity="0.46"/>'
-        '<stop offset="62%" stop-color="#2FA653" stop-opacity="0.44"/>'
-        '<stop offset="100%" stop-color="#0F5A30" stop-opacity="0.52"/>'
+        '<stop offset="0%" stop-color="#A85A00" stop-opacity="0.34"/>'
+        '<stop offset="16%" stop-color="#FFF0DC" stop-opacity="0.58"/>'
+        '<stop offset="34%" stop-color="#FFC978" stop-opacity="0.46"/>'
+        '<stop offset="62%" stop-color="#F59120" stop-opacity="0.44"/>'
+        '<stop offset="100%" stop-color="#8F4A00" stop-opacity="0.52"/>'
         "</linearGradient>"
         f'<linearGradient id="glassVert{sfx}" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.14"/>'
-        '<stop offset="50%" stop-color="#D6F2DE" stop-opacity="0.06"/>'
-        '<stop offset="100%" stop-color="#1E9E48" stop-opacity="0.28"/>'
+        '<stop offset="50%" stop-color="#FFE7C4" stop-opacity="0.06"/>'
+        '<stop offset="100%" stop-color="#E07C00" stop-opacity="0.28"/>'
         "</linearGradient>"
         f'<linearGradient id="glassSpec{sfx}" x1="0" y1="0" x2="0" y2="1">'
         '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>'
@@ -433,7 +433,7 @@ def _svg_levels(segs, rows, total_s, thresh, w=920, h=210):
         if ev["likely_snore"]:
             x0, x1 = x(ev["start_t"]), x(ev["start_t"] + ev["duration_s"])
             p.append(f'<rect x="{x0:.1f}" y="{pt}" width="{max(1.5,x1-x0):.1f}" '
-                     f'height="{ih}" fill="#8FD9A3" opacity="0.20" rx="2"/>')
+                     f'height="{ih}" fill="#FBC37A" opacity="0.22" rx="2"/>')
     # 音量包络
     if segs and total_s:
         nb = min(iw, 900)
@@ -547,14 +547,14 @@ def write_report(outdir, tag, summary, rows, segs, cfg, note=None):
 <div class="cards">{card_html}</div>
 <section><h2>整夜时间轴</h2>
 {_svg_timeline(rows, total, t0)}
-<div class="legend"><i style="background:linear-gradient(180deg,#DCF7E3,#2E9E52)"></i>成串鼾声<i style="background:linear-gradient(180deg,#EEEEF2,#C4C4CB)"></i>孤立响声</div>
+<div class="legend"><i style="background:linear-gradient(180deg,#FFF0DC,#E07C00)"></i>成串鼾声<i style="background:linear-gradient(180deg,#EEEEF2,#C4C4CB)"></i>孤立响声</div>
 </section>
 <section><h2>每小时鼾声时长</h2>
 {_svg_hourly(rows, total, t0)}
 </section>
 <section><h2>整夜音量曲线</h2>
 {_svg_levels(segs, rows, total, summary['cfg']['abs_floor_dbfs'])}
-<div class="legend">深蓝色线为每秒音量（上下包络）；浅绿色阴影为判定出的鼾声时段；红色虚线为绝对判定门。</div>
+<div class="legend">深蓝色线为每秒音量（上下包络）；浅橙色阴影为判定出的鼾声时段；红色虚线为绝对判定门。</div>
 </section>
 <section><h2>逐次事件明细</h2>{table}</section>
 <section><h2>结论</h2>
