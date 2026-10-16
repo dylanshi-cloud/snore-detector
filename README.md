@@ -46,6 +46,8 @@ python snore_detect.py --warmup 3          # 临时改学习期
 python snore_detect.py --no-clips          # 不存音频片段
 python snore_detect.py --no-open           # 跑完不自动打开报告
 python snore_detect.py --help
+
+python rebuild_report.py                   # 用现成 CSV/JSON 重画报告(改样式后, 不必重跑音频)
 ```
 
 Windows 用户：双击 `run.bat` 即开始采集；把录音文件拖到 `分析录音.bat` 上即开始分析。

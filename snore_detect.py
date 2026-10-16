@@ -224,16 +224,16 @@ REPORT_CSS = """
 :root{--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#8e8e93;--line:rgba(0,0,0,.07);
  --blue:#0071e3;--orange:#ff9500;--red:#ff3b30;--green:#34c759}
 *{box-sizing:border-box}
-body{margin:0;color:var(--ink);background:#f5f5f7;letter-spacing:-.01em;
+body{margin:0;color:var(--ink);letter-spacing:-.01em;
+ background-color:#f5f5f7;background-repeat:no-repeat;background-attachment:fixed;
+ background-image:
+  radial-gradient(40% 32% at 12% 4%,rgba(0,113,227,.24),transparent 72%),
+  radial-gradient(36% 30% at 90% 0%,rgba(255,149,0,.22),transparent 72%),
+  radial-gradient(46% 38% at 74% 96%,rgba(52,199,89,.17),transparent 72%),
+  radial-gradient(32% 28% at 2% 90%,rgba(175,82,222,.15),transparent 72%);
  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",
  "PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-body::before{content:"";position:fixed;inset:-25%;z-index:-1;filter:blur(24px);
- background:
-  radial-gradient(38% 30% at 12% 6%,rgba(0,113,227,.18),transparent 70%),
-  radial-gradient(34% 28% at 90% 2%,rgba(255,149,0,.16),transparent 70%),
-  radial-gradient(42% 34% at 72% 94%,rgba(52,199,89,.12),transparent 70%),
-  radial-gradient(30% 26% at 4% 88%,rgba(175,82,222,.10),transparent 70%)}
 .wrap{max-width:1000px;margin:0 auto;padding:44px 22px 72px}
 h1{font-size:34px;font-weight:700;letter-spacing:-.035em;margin:0 0 7px}
 .sub{color:var(--ink2);font-size:14px;margin-bottom:28px}
@@ -265,7 +265,7 @@ audio{height:30px;vertical-align:middle}
 .note{background:rgba(0,113,227,.09);border:1px solid rgba(0,113,227,.20);
  padding:14px 18px;border-radius:16px;font-size:13px;color:#0b4a8f;margin-bottom:24px;line-height:1.7}
 .foot{color:var(--ink3);font-size:12px;text-align:center;margin-top:36px;line-height:1.9}
-@media print{body{background:#fff}body::before{display:none}.wrap{padding:0}
+@media print{body{background:#fff;background-image:none}.wrap{padding:0}
  .card,section{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;
   box-shadow:none;border:1px solid #e5e5ea;break-inside:avoid}
  audio{display:none}.clipcell{font-size:11px}}
