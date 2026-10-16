@@ -288,25 +288,68 @@ def _svgtxt(x, y, s, size=11, fill="#8e8e93", anchor="middle", weight="400"):
 
 
 def _glass_defs(sfx):
-    """凝胶柱用的渐变定义(每张图各一份, 免得 id 撞车)。"""
-    b, g, s = f"glassBlue{sfx}", f"glassGray{sfx}", f"glassGloss{sfx}"
+    """玻璃/琉璃用渐变定义(每张图各一份, 免得 id 撞车)。"""
     return (
         "<defs>"
-        f'<linearGradient id="{b}" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#BFE0FF" stop-opacity="0.98"/>'
-        '<stop offset="38%" stop-color="#6FB6FF" stop-opacity="0.88"/>'
-        '<stop offset="100%" stop-color="#2E84E6" stop-opacity="0.72"/>'
+        # 时间轴: 竖向玻璃胶囊
+        f'<linearGradient id="glassBlue{sfx}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#D6EAFF" stop-opacity="0.70"/>'
+        '<stop offset="45%" stop-color="#7DB7EE" stop-opacity="0.52"/>'
+        '<stop offset="100%" stop-color="#2E84E6" stop-opacity="0.40"/>'
         "</linearGradient>"
-        f'<linearGradient id="{g}" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#EEEEF2" stop-opacity="0.96"/>'
-        '<stop offset="100%" stop-color="#C4C4CB" stop-opacity="0.86"/>'
+        f'<linearGradient id="glassGray{sfx}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#F2F2F6" stop-opacity="0.78"/>'
+        '<stop offset="100%" stop-color="#C4C4CB" stop-opacity="0.58"/>'
         "</linearGradient>"
-        f'<linearGradient id="{s}" x1="0" y1="0" x2="0" y2="1">'
-        '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.66"/>'
+        f'<linearGradient id="glassGloss{sfx}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.58"/>'
         '<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>'
+        "</linearGradient>"
+        # 柱状图: 横向柱面, 光从左侧打 → 左亮带 / 右暗核; 整体压得很透
+        f'<linearGradient id="glassBody{sfx}" x1="0" y1="0" x2="1" y2="0">'
+        '<stop offset="0%" stop-color="#2A64A6" stop-opacity="0.20"/>'
+        '<stop offset="18%" stop-color="#FFFFFF" stop-opacity="0.60"/>'
+        '<stop offset="34%" stop-color="#A8D2F7" stop-opacity="0.34"/>'
+        '<stop offset="62%" stop-color="#6FA9E6" stop-opacity="0.26"/>'
+        '<stop offset="88%" stop-color="#2E6FB4" stop-opacity="0.26"/>'
+        '<stop offset="100%" stop-color="#22497E" stop-opacity="0.34"/>'
+        "</linearGradient>"
+        f'<linearGradient id="glassVert{sfx}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>'
+        '<stop offset="52%" stop-color="#BFE0FF" stop-opacity="0.05"/>'
+        '<stop offset="100%" stop-color="#2E84E6" stop-opacity="0.20"/>'
+        "</linearGradient>"
+        f'<linearGradient id="glassSpec{sfx}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>'
+        '<stop offset="55%" stop-color="#FFFFFF" stop-opacity="0.80"/>'
+        '<stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.20"/>'
         "</linearGradient>"
         "</defs>"
     )
+
+
+def _glass_column(x, ytop, ybot, w, sfx):
+    """一根立体琉璃柱: 侧面外鼓 + 顶面圆弧突起 + 柱面明暗 + 竖向高光 + 顶珠。"""
+    h = ybot - ytop
+    x0, x1, xm = x, x + w, x + w / 2.0
+    ym = (ytop + ybot) / 2.0
+    bulge = min(w * 0.09, 5.5)                        # 侧面鼓出量
+    dome = min(min(w * 0.22, 7.0), h * 0.5)           # 顶面圆弧突起
+    d = (f"M {x0:.2f} {ytop:.2f} "
+         f"Q {xm:.2f} {ytop - dome:.2f} {x1:.2f} {ytop:.2f} "
+         f"Q {x1 + bulge:.2f} {ym:.2f} {x1:.2f} {ybot:.2f} "
+         f"L {x0:.2f} {ybot:.2f} "
+         f"Q {x0 - bulge:.2f} {ym:.2f} {x0:.2f} {ytop:.2f} Z")
+    out = (f'<path d="{d}" fill="url(#glassBody{sfx})"/>'
+           f'<path d="{d}" fill="url(#glassVert{sfx})"/>'
+           f'<path d="{d}" fill="none" stroke="#ffffff" stroke-opacity="0.45" '
+           f'stroke-width="0.7"/>')
+    if h > 12 and w > 12:                             # 侧光高光条(靠左, 光从左边来)
+        hw = max(1.4, w * 0.17)
+        out += (f'<rect x="{x0 + w * 0.16:.2f}" y="{ytop + h * 0.14:.2f}" '
+                f'width="{hw:.2f}" height="{h * 0.58:.2f}" rx="{hw / 2:.2f}" '
+                f'fill="url(#glassSpec{sfx})"/>')
+    return out
 
 
 def _svg_timeline(rows, total_s, t0, w=920, h=66):
@@ -362,14 +405,8 @@ def _svg_hourly(rows, total_s, t0, w=920, h=170):
         xx = pl + i * bw + bw * 0.16
         bwid = bw * 0.68
         if v > 0:
-            p.append(f'<rect x="{xx:.1f}" y="{pt+ih-bh:.1f}" width="{bwid:.1f}" '
-                     f'height="{max(bh,1.5):.1f}" rx="6" fill="url(#glassBlueH)" '
-                     f'stroke="#ffffff" stroke-opacity="0.6" stroke-width="1"/>')
-            gh = min(bh * 0.40, 11.0)                      # 顶部高光 = 凝胶质感
-            if bh > 5 and bwid > 6:
-                p.append(f'<rect x="{xx+1.6:.1f}" y="{pt+ih-bh+1.4:.1f}" '
-                         f'width="{bwid-3.2:.1f}" height="{gh:.1f}" rx="{min(5.0, gh/2):.1f}" '
-                         f'fill="url(#glassGlossH)"/>')
+            bh3 = max(bh, 3.0)
+            p.append(_glass_column(xx, pt + ih - bh3, pt + ih, bwid, "H"))
         else:
             p.append(f'<rect x="{xx:.1f}" y="{pt+ih-1.5:.1f}" width="{bwid:.1f}" '
                      f'height="1.5" rx="0.75" fill="#e8e8ed"/>')
@@ -387,7 +424,7 @@ def _svg_levels(segs, rows, total_s, thresh, w=920, h=210):
     DB0, DB1 = 0.0, -100.0
     x = lambda t: pl + (t / total_s) * iw if total_s else pl
     y = lambda db: pt + (DB0 - max(DB1, min(DB0, db))) / (DB0 - DB1) * ih
-    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">', _glass_defs("L")]
+    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">']
     for gd in (0, -20, -40, -60, -80, -100):
         yy = y(gd)
         p.append(f'<line x1="{pl}" y1="{yy:.1f}" x2="{w-pr}" y2="{yy:.1f}" stroke="#f0f0f2"/>')
