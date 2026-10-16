@@ -255,9 +255,9 @@ section h2{font-size:17px;margin:0 0 16px;font-weight:600;letter-spacing:-.015em
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
 th{color:var(--ink2);font-weight:600;font-size:12px}
-tr.likely{background:rgba(255,149,0,.07)}
+tr.likely{background:rgba(0,113,227,.055)}
 .pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:600}
-.pill.y{background:rgba(255,149,0,.16);color:#b25000}
+.pill.y{background:rgba(0,113,227,.15);color:#0a5bbd}
 .pill.n{background:rgba(120,120,128,.14);color:#48484a}
 audio{height:30px;vertical-align:middle}
 .clipcell{color:var(--ink3);font-size:11px;margin-left:6px}
@@ -287,12 +287,34 @@ def _svgtxt(x, y, s, size=11, fill="#8e8e93", anchor="middle", weight="400"):
             f'text-anchor="{anchor}" font-weight="{weight}">{_esc(s)}</text>')
 
 
+def _glass_defs(sfx):
+    """凝胶柱用的渐变定义(每张图各一份, 免得 id 撞车)。"""
+    b, g, s = f"glassBlue{sfx}", f"glassGray{sfx}", f"glassGloss{sfx}"
+    return (
+        "<defs>"
+        f'<linearGradient id="{b}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#BFE0FF" stop-opacity="0.98"/>'
+        '<stop offset="38%" stop-color="#6FB6FF" stop-opacity="0.88"/>'
+        '<stop offset="100%" stop-color="#2E84E6" stop-opacity="0.72"/>'
+        "</linearGradient>"
+        f'<linearGradient id="{g}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#EEEEF2" stop-opacity="0.96"/>'
+        '<stop offset="100%" stop-color="#C4C4CB" stop-opacity="0.86"/>'
+        "</linearGradient>"
+        f'<linearGradient id="{s}" x1="0" y1="0" x2="0" y2="1">'
+        '<stop offset="0%" stop-color="#ffffff" stop-opacity="0.66"/>'
+        '<stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>'
+        "</linearGradient>"
+        "</defs>"
+    )
+
+
 def _svg_timeline(rows, total_s, t0, w=920, h=66):
     """整夜时间条: 每个鼾声事件一格, 横轴是时间。"""
     pl, pr, pt, ph = 8, 8, 14, 26
     inner = w - pl - pr
     x = lambda t: pl + (t / total_s) * inner if total_s else pl
-    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">']
+    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">', _glass_defs("T")]
     p.append(f'<rect x="{pl}" y="{pt}" width="{inner}" height="{ph}" rx="8" fill="#e8e8ed"/>')
     # 小时刻度
     step = 3600.0
@@ -308,9 +330,13 @@ def _svg_timeline(rows, total_s, t0, w=920, h=66):
         t += step
     for ev in rows:
         x0, x1 = x(ev["start_t"]), x(ev["start_t"] + max(ev["duration_s"], 1.0))
-        col = "#ff9500" if ev["likely_snore"] else "#aeaeb2"
-        p.append(f'<rect x="{x0:.1f}" y="{pt}" width="{max(3.0, x1-x0):.1f}" height="{ph}" '
-                 f'fill="{col}" rx="3"/>')
+        col = "url(#glassBlueT)" if ev["likely_snore"] else "url(#glassGrayT)"
+        bw3 = max(3.5, x1 - x0)
+        p.append(f'<rect x="{x0:.1f}" y="{pt}" width="{bw3:.1f}" height="{ph}" '
+                 f'fill="{col}" rx="3.5" stroke="#ffffff" stroke-opacity="0.55" stroke-width="0.9"/>')
+        if bw3 > 6:                                        # 窄条不画高光, 不然糊成一团
+            p.append(f'<rect x="{x0+1:.1f}" y="{pt+1.4:.1f}" width="{bw3-2:.1f}" '
+                     f'height="{ph*0.42:.1f}" rx="2.6" fill="url(#glassGlossT)"/>')
     p.append("</svg>")
     return "".join(p)
 
@@ -326,7 +352,7 @@ def _svg_hourly(rows, total_s, t0, w=920, h=170):
     ih = h - pt - pb
     bw = (w - pl - pr) / nh
     mx = max(1.0, per.max())
-    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">']
+    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">', _glass_defs("H")]
     for gv in (0, mx / 2, mx):
         yy = pt + ih - (gv / mx) * ih
         p.append(f'<line x1="{pl}" y1="{yy:.1f}" x2="{w-pr}" y2="{yy:.1f}" stroke="#f0f0f2"/>')
@@ -335,9 +361,18 @@ def _svg_hourly(rows, total_s, t0, w=920, h=170):
         bh = (v / mx) * ih
         xx = pl + i * bw + bw * 0.16
         bwid = bw * 0.68
-        col = "#ff9500" if v > 0 else "#e8e8ed"
-        p.append(f'<rect x="{xx:.1f}" y="{pt+ih-bh:.1f}" width="{bwid:.1f}" '
-                 f'height="{max(bh,1.5):.1f}" rx="5" fill="{col}"/>')
+        if v > 0:
+            p.append(f'<rect x="{xx:.1f}" y="{pt+ih-bh:.1f}" width="{bwid:.1f}" '
+                     f'height="{max(bh,1.5):.1f}" rx="6" fill="url(#glassBlueH)" '
+                     f'stroke="#ffffff" stroke-opacity="0.6" stroke-width="1"/>')
+            gh = min(bh * 0.40, 11.0)                      # 顶部高光 = 凝胶质感
+            if bh > 5 and bwid > 6:
+                p.append(f'<rect x="{xx+1.6:.1f}" y="{pt+ih-bh+1.4:.1f}" '
+                         f'width="{bwid-3.2:.1f}" height="{gh:.1f}" rx="{min(5.0, gh/2):.1f}" '
+                         f'fill="url(#glassGlossH)"/>')
+        else:
+            p.append(f'<rect x="{xx:.1f}" y="{pt+ih-1.5:.1f}" width="{bwid:.1f}" '
+                     f'height="1.5" rx="0.75" fill="#e8e8ed"/>')
         lbl = (t0 + timedelta(hours=i)).strftime("%H:%M")
         if bw > 34 or i % 2 == 0:
             p.append(_svgtxt(xx + bwid / 2, h - 10, lbl, 10))
@@ -352,7 +387,7 @@ def _svg_levels(segs, rows, total_s, thresh, w=920, h=210):
     DB0, DB1 = 0.0, -100.0
     x = lambda t: pl + (t / total_s) * iw if total_s else pl
     y = lambda db: pt + (DB0 - max(DB1, min(DB0, db))) / (DB0 - DB1) * ih
-    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">']
+    p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">', _glass_defs("L")]
     for gd in (0, -20, -40, -60, -80, -100):
         yy = y(gd)
         p.append(f'<line x1="{pl}" y1="{yy:.1f}" x2="{w-pr}" y2="{yy:.1f}" stroke="#f0f0f2"/>')
@@ -362,7 +397,7 @@ def _svg_levels(segs, rows, total_s, thresh, w=920, h=210):
         if ev["likely_snore"]:
             x0, x1 = x(ev["start_t"]), x(ev["start_t"] + ev["duration_s"])
             p.append(f'<rect x="{x0:.1f}" y="{pt}" width="{max(1.5,x1-x0):.1f}" '
-                     f'height="{ih}" fill="#ff9500" opacity="0.16" rx="2"/>')
+                     f'height="{ih}" fill="#7FBFFF" opacity="0.18" rx="2"/>')
     # 音量包络
     if segs and total_s:
         nb = min(iw, 900)
@@ -476,14 +511,14 @@ def write_report(outdir, tag, summary, rows, segs, cfg, note=None):
 <div class="cards">{card_html}</div>
 <section><h2>整夜时间轴</h2>
 {_svg_timeline(rows, total, t0)}
-<div class="legend"><i style="background:#ff9500"></i>成串鼾声<i style="background:#aeaeb2"></i>孤立响声</div>
+<div class="legend"><i style="background:linear-gradient(180deg,#BFE0FF,#2E84E6)"></i>成串鼾声<i style="background:linear-gradient(180deg,#EEEEF2,#C4C4CB)"></i>孤立响声</div>
 </section>
 <section><h2>每小时鼾声时长</h2>
 {_svg_hourly(rows, total, t0)}
 </section>
 <section><h2>整夜音量曲线</h2>
 {_svg_levels(segs, rows, total, summary['cfg']['abs_floor_dbfs'])}
-<div class="legend">蓝色为每秒音量（上下包络）；橙色阴影为判定出的鼾声时段；红色虚线为绝对判定门。</div>
+<div class="legend">深蓝色线为每秒音量（上下包络）；浅蓝色阴影为判定出的鼾声时段；红色虚线为绝对判定门。</div>
 </section>
 <section><h2>逐次事件明细</h2>{table}</section>
 <section><h2>结论</h2>
