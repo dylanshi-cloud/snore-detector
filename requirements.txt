@@ -1,0 +1,4 @@
+numpy
+sounddevice
+# 可选：--replay 分析 m4a/mp3 等压缩格式时需要（自带新版 ffmpeg）
+imageio-ffmpeg
