@@ -221,38 +221,54 @@ def fmt_hms(sec):
 
 # ---------------- 图文报告 (自包含 HTML, 内联 SVG, 零依赖) ----------------
 REPORT_CSS = """
+:root{--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#8e8e93;--line:rgba(0,0,0,.07);
+ --blue:#0071e3;--orange:#ff9500;--red:#ff3b30;--green:#34c759}
 *{box-sizing:border-box}
-body{margin:0;background:#eef2f7;color:#0f172a;
- font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",system-ui,sans-serif}
-.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
-h1{font-size:24px;margin:0 0 4px}
-.sub{color:#64748b;font-size:13px;margin-bottom:22px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
-.card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 1px 3px rgba(15,23,42,.08)}
-.card .k{font-size:12px;color:#64748b;margin-bottom:6px}
-.card .v{font-size:28px;font-weight:700;line-height:1.1}
-.card .u{font-size:14px;font-weight:400;color:#94a3b8;margin-left:3px}
-.card .h{font-size:12px;color:#94a3b8;margin-top:5px}
-.hi{color:#dc2626}.mid{color:#ea580c}.ok{color:#059669}
-section{background:#fff;border-radius:14px;padding:18px 20px 20px;margin-bottom:18px;
- box-shadow:0 1px 3px rgba(15,23,42,.08)}
-section h2{font-size:15px;margin:0 0 14px;color:#334155;font-weight:600}
-.legend{font-size:12px;color:#64748b;margin-top:10px}
-.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin:0 5px 0 14px;vertical-align:-1px}
+body{margin:0;color:var(--ink);background:#f5f5f7;letter-spacing:-.01em;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",
+ "PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+ -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body::before{content:"";position:fixed;inset:-25%;z-index:-1;filter:blur(24px);
+ background:
+  radial-gradient(38% 30% at 12% 6%,rgba(0,113,227,.18),transparent 70%),
+  radial-gradient(34% 28% at 90% 2%,rgba(255,149,0,.16),transparent 70%),
+  radial-gradient(42% 34% at 72% 94%,rgba(52,199,89,.12),transparent 70%),
+  radial-gradient(30% 26% at 4% 88%,rgba(175,82,222,.10),transparent 70%)}
+.wrap{max-width:1000px;margin:0 auto;padding:44px 22px 72px}
+h1{font-size:34px;font-weight:700;letter-spacing:-.035em;margin:0 0 7px}
+.sub{color:var(--ink2);font-size:14px;margin-bottom:28px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(164px,1fr));gap:16px;margin-bottom:24px}
+.card,section{background:rgba(255,255,255,.72);
+ -webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);
+ border:1px solid rgba(255,255,255,.7);box-shadow:0 8px 30px rgba(0,0,0,.06)}
+.card{border-radius:22px;padding:18px 20px}
+.card .k{font-size:12px;color:var(--ink2);margin-bottom:9px;font-weight:500}
+.card .v{font-size:30px;font-weight:600;line-height:1.08;letter-spacing:-.025em}
+.card .u{font-size:14px;font-weight:400;color:var(--ink3);margin-left:4px}
+.card .h{font-size:12px;color:var(--ink3);margin-top:7px}
+.hi{color:var(--red)}.mid{color:var(--orange)}.ok{color:var(--green)}
+section{border-radius:22px;padding:22px 24px 24px;margin-bottom:20px}
+section h2{font-size:17px;margin:0 0 16px;font-weight:600;letter-spacing:-.015em}
+.legend{font-size:12px;color:var(--ink2);margin-top:12px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:4px;margin:0 6px 0 16px;vertical-align:-1px}
+.legend i:first-child{margin-left:0}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:7px 9px;text-align:left;border-bottom:1px solid #eef2f7;white-space:nowrap}
-th{color:#64748b;font-weight:600;font-size:12px;background:#f8fafc}
-tr.likely{background:#fff7ed}
-.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:600}
-.pill.y{background:#ffedd5;color:#c2410c}
-.pill.n{background:#e2e8f0;color:#475569}
-audio{height:28px;vertical-align:middle}
-.empty{color:#94a3b8;font-size:13px;padding:14px 0}
-.note{background:#fffbeb;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:8px;
- font-size:13px;color:#78350f;margin-bottom:18px;line-height:1.7}
-.foot{color:#94a3b8;font-size:12px;text-align:center;margin-top:26px;line-height:1.8}
-@media print{body{background:#fff}.wrap{padding:0}section,.card{box-shadow:none;border:1px solid #e2e8f0}
- .card{break-inside:avoid}audio{display:none}.clipcell{color:#94a3b8;font-size:11px}}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--ink2);font-weight:600;font-size:12px}
+tr.likely{background:rgba(255,149,0,.07)}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.pill.y{background:rgba(255,149,0,.16);color:#b25000}
+.pill.n{background:rgba(120,120,128,.14);color:#48484a}
+audio{height:30px;vertical-align:middle}
+.clipcell{color:var(--ink3);font-size:11px;margin-left:6px}
+.empty{color:var(--ink3);font-size:13px;padding:16px 0}
+.note{background:rgba(0,113,227,.09);border:1px solid rgba(0,113,227,.20);
+ padding:14px 18px;border-radius:16px;font-size:13px;color:#0b4a8f;margin-bottom:24px;line-height:1.7}
+.foot{color:var(--ink3);font-size:12px;text-align:center;margin-top:36px;line-height:1.9}
+@media print{body{background:#fff}body::before{display:none}.wrap{padding:0}
+ .card,section{background:#fff;-webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:none;border:1px solid #e5e5ea;break-inside:avoid}
+ audio{display:none}.clipcell{font-size:11px}}
 """
 
 
@@ -266,7 +282,7 @@ def _hms(sec):
     return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
 
 
-def _svgtxt(x, y, s, size=11, fill="#94a3b8", anchor="middle", weight="400"):
+def _svgtxt(x, y, s, size=11, fill="#8e8e93", anchor="middle", weight="400"):
     return (f'<text x="{x:.0f}" y="{y:.0f}" font-size="{size}" fill="{fill}" '
             f'text-anchor="{anchor}" font-weight="{weight}">{_esc(s)}</text>')
 
@@ -277,7 +293,7 @@ def _svg_timeline(rows, total_s, t0, w=920, h=66):
     inner = w - pl - pr
     x = lambda t: pl + (t / total_s) * inner if total_s else pl
     p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">']
-    p.append(f'<rect x="{pl}" y="{pt}" width="{inner}" height="{ph}" rx="6" fill="#e2e8f0"/>')
+    p.append(f'<rect x="{pl}" y="{pt}" width="{inner}" height="{ph}" rx="8" fill="#e8e8ed"/>')
     # 小时刻度
     step = 3600.0
     if total_s > 12 * 3600:
@@ -286,15 +302,15 @@ def _svg_timeline(rows, total_s, t0, w=920, h=66):
     while t <= total_s:
         xx = x(t)
         anc = "start" if xx < 26 else ("end" if xx > w - pr - 26 else "middle")
-        p.append(f'<line x1="{xx:.1f}" y1="{pt}" x2="{xx:.1f}" y2="{pt+ph}" stroke="#cbd5e1" stroke-width="1"/>')
+        p.append(f'<line x1="{xx:.1f}" y1="{pt}" x2="{xx:.1f}" y2="{pt+ph}" stroke="#d1d1d6" stroke-width="1"/>')
         p.append(_svgtxt(xx, pt - 4, (t0 + timedelta(seconds=t)).strftime("%H:%M"),
                          anchor=anc))
         t += step
     for ev in rows:
         x0, x1 = x(ev["start_t"]), x(ev["start_t"] + max(ev["duration_s"], 1.0))
-        col = "#ea580c" if ev["likely_snore"] else "#94a3b8"
-        p.append(f'<rect x="{x0:.1f}" y="{pt}" width="{max(2.0, x1-x0):.1f}" height="{ph}" '
-                 f'fill="{col}" rx="2"/>')
+        col = "#ff9500" if ev["likely_snore"] else "#aeaeb2"
+        p.append(f'<rect x="{x0:.1f}" y="{pt}" width="{max(3.0, x1-x0):.1f}" height="{ph}" '
+                 f'fill="{col}" rx="3"/>')
     p.append("</svg>")
     return "".join(p)
 
@@ -313,15 +329,15 @@ def _svg_hourly(rows, total_s, t0, w=920, h=170):
     p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">']
     for gv in (0, mx / 2, mx):
         yy = pt + ih - (gv / mx) * ih
-        p.append(f'<line x1="{pl}" y1="{yy:.1f}" x2="{w-pr}" y2="{yy:.1f}" stroke="#eef2f7"/>')
-        p.append(_svgtxt(pl - 8, yy + 4, f"{int(gv)}s", 10, "#94a3b8", "end"))
+        p.append(f'<line x1="{pl}" y1="{yy:.1f}" x2="{w-pr}" y2="{yy:.1f}" stroke="#f0f0f2"/>')
+        p.append(_svgtxt(pl - 8, yy + 4, f"{int(gv)}s", 10, "#8e8e93", "end"))
     for i, v in enumerate(per):
         bh = (v / mx) * ih
         xx = pl + i * bw + bw * 0.16
         bwid = bw * 0.68
-        col = "#f97316" if v > 0 else "#e2e8f0"
+        col = "#ff9500" if v > 0 else "#e8e8ed"
         p.append(f'<rect x="{xx:.1f}" y="{pt+ih-bh:.1f}" width="{bwid:.1f}" '
-                 f'height="{max(bh,1.5):.1f}" rx="3" fill="{col}"/>')
+                 f'height="{max(bh,1.5):.1f}" rx="5" fill="{col}"/>')
         lbl = (t0 + timedelta(hours=i)).strftime("%H:%M")
         if bw > 34 or i % 2 == 0:
             p.append(_svgtxt(xx + bwid / 2, h - 10, lbl, 10))
@@ -339,14 +355,14 @@ def _svg_levels(segs, rows, total_s, thresh, w=920, h=210):
     p = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="display:block">']
     for gd in (0, -20, -40, -60, -80, -100):
         yy = y(gd)
-        p.append(f'<line x1="{pl}" y1="{yy:.1f}" x2="{w-pr}" y2="{yy:.1f}" stroke="#eef2f7"/>')
-        p.append(_svgtxt(pl - 8, yy + 4, f"{gd}", 10, "#94a3b8", "end"))
+        p.append(f'<line x1="{pl}" y1="{yy:.1f}" x2="{w-pr}" y2="{yy:.1f}" stroke="#f0f0f2"/>')
+        p.append(_svgtxt(pl - 8, yy + 4, f"{gd}", 10, "#8e8e93", "end"))
     # 事件阴影
     for ev in rows:
         if ev["likely_snore"]:
             x0, x1 = x(ev["start_t"]), x(ev["start_t"] + ev["duration_s"])
             p.append(f'<rect x="{x0:.1f}" y="{pt}" width="{max(1.5,x1-x0):.1f}" '
-                     f'height="{ih}" fill="#f97316" opacity="0.13"/>')
+                     f'height="{ih}" fill="#ff9500" opacity="0.16" rx="2"/>')
     # 音量包络
     if segs and total_s:
         nb = min(iw, 900)
@@ -359,13 +375,13 @@ def _svg_levels(segs, rows, total_s, thresh, w=920, h=210):
         xs = [pl + (i + 0.5) / nb * iw for i in range(nb)]
         up = " ".join(f"{xs[i]:.1f},{y(top[i]):.1f}" for i in range(nb))
         dn = " ".join(f"{xs[i]:.1f},{y(bot[i]):.1f}" for i in range(nb - 1, -1, -1))
-        p.append(f'<polygon points="{up} {dn}" fill="#3b82f6" opacity="0.45"/>')
-        p.append(f'<polyline points="{up}" fill="none" stroke="#2563eb" stroke-width="1.1"/>')
+        p.append(f'<polygon points="{up} {dn}" fill="#0071e3" opacity="0.40"/>')
+        p.append(f'<polyline points="{up}" fill="none" stroke="#0071e3" stroke-width="1.2"/>')
     # 判定门
     yt = y(thresh)
-    p.append(f'<line x1="{pl}" y1="{yt:.1f}" x2="{w-pr}" y2="{yt:.1f}" stroke="#dc2626" '
-             f'stroke-width="1.4" stroke-dasharray="6 4"/>')
-    p.append(_svgtxt(w - pr - 4, yt - 5, f"判定门 {thresh:.0f} dBFS", 10, "#dc2626", "end"))
+    p.append(f'<line x1="{pl}" y1="{yt:.1f}" x2="{w-pr}" y2="{yt:.1f}" stroke="#ff3b30" '
+             f'stroke-width="1.5" stroke-dasharray="6 4"/>')
+    p.append(_svgtxt(w - pr - 4, yt - 6, f"判定门 {thresh:.0f} dBFS", 10, "#ff3b30", "end"))
     # 时间轴
     step = 3600.0 if total_s <= 12 * 3600 else 7200.0
     t = 0.0
@@ -460,7 +476,7 @@ def write_report(outdir, tag, summary, rows, segs, cfg, note=None):
 <div class="cards">{card_html}</div>
 <section><h2>整夜时间轴</h2>
 {_svg_timeline(rows, total, t0)}
-<div class="legend"><i style="background:#ea580c"></i>成串鼾声<i style="background:#94a3b8"></i>孤立响声</div>
+<div class="legend"><i style="background:#ff9500"></i>成串鼾声<i style="background:#aeaeb2"></i>孤立响声</div>
 </section>
 <section><h2>每小时鼾声时长</h2>
 {_svg_hourly(rows, total, t0)}
